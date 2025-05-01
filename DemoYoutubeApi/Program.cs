@@ -20,28 +20,6 @@ namespace DemoYoutubeApi
 
             // Add services to the container.
 
-            var apiKey = builder.Configuration["youtubeApiKey"];
-
-            // Register the YouTubeService with the API key from configuration as a singleton
-
-            builder.Services.AddSingleton(async _ =>
-            {
-                using var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read);
-
-                var cred = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
-                    new[] { YouTubeService.Scope.YoutubeReadonly },
-                    "user",                          // identifierar den som loggar in
-                    CancellationToken.None,
-                    new FileDataStore("YT.Auth.Store", true));  // sparar refresh-token lokalt
-
-                return new YouTubeService(new BaseClientService.Initializer
-                {
-                    HttpClientInitializer = cred,
-                    ApplicationName = "KursAppen"
-                });
-            });
-
             builder.Services.AddControllers();
 
 
