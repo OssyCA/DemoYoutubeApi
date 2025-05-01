@@ -1,3 +1,8 @@
+﻿
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using Google.Apis.YouTube.v3;
 
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
@@ -15,7 +20,31 @@ namespace DemoYoutubeApi
 
             // Add services to the container.
 
+            var apiKey = builder.Configuration["youtubeApiKey"];
+
+            // Register the YouTubeService with the API key from configuration as a singleton
+
+            builder.Services.AddSingleton(async _ =>
+            {
+                using var stream = new FileStream("credentials.json", FileMode.Open, FileAccess.Read);
+
+                var cred = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.FromStream(stream).Secrets,
+                    new[] { YouTubeService.Scope.YoutubeReadonly },
+                    "user",                          // identifierar den som loggar in
+                    CancellationToken.None,
+                    new FileDataStore("YT.Auth.Store", true));  // sparar refresh-token lokalt
+
+                return new YouTubeService(new BaseClientService.Initializer
+                {
+                    HttpClientInitializer = cred,
+                    ApplicationName = "KursAppen"
+                });
+            });
+
             builder.Services.AddControllers();
+
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -33,6 +62,8 @@ namespace DemoYoutubeApi
 
 
             var app = builder.Build();
+
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
