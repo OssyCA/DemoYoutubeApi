@@ -3,6 +3,7 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace DemoYoutubeApi.Controllers
 {
@@ -10,13 +11,20 @@ namespace DemoYoutubeApi.Controllers
     [ApiController]
     public class YoutubeController : ControllerBase
     {
+        private readonly IConfiguration _configuration;
+
+        // Add constructor to inject IConfiguration
+        public YoutubeController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         [HttpGet]
         public async Task<IActionResult> GetChannelVideo(string? pagetoken = null, int maxResult = 50)
         {
             var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
-                ApiKey = "AIzaSyDvk9WL-p-hk_dJrD-K_Txh2GtDEi5g5lU",
-                ApplicationName = "youtubeDemoApp"
+                ApiKey = _configuration.GetValue<string>("YoutubeApiKey"),
+                ApplicationName = "YoutubeAPI"
             });
 
             var searchRequest = youtubeService.Search.List("snippet"); // Get snippet of video, title, thuimbnail, video id, date, discription
