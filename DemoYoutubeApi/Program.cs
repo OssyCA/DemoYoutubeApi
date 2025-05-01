@@ -1,4 +1,10 @@
 
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;
+using Google.Apis.YouTube.v3;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+
 namespace DemoYoutubeApi
 {
     public class Program
@@ -13,6 +19,18 @@ namespace DemoYoutubeApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            var apiKey = builder.Configuration["youtubeApiKey"];
+
+            builder.Services.AddSingleton(provider =>
+            {
+                return new YouTubeService(new BaseClientService.Initializer
+                {
+                    ApiKey = apiKey,
+                    ApplicationName = "KursAppen"
+                });
+            });
+
 
             var app = builder.Build();
 
