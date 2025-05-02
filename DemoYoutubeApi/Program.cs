@@ -27,6 +27,8 @@ namespace DemoYoutubeApi
                                .AllowAnyHeader();
                     });
             });
+            builder.Services.AddScoped<YouTubeAuthService>();
+
 
             builder.Services.AddDbContext<YoutubeDbContext>(option =>
             {
@@ -36,17 +38,6 @@ namespace DemoYoutubeApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            var apiKey = builder.Configuration["youtubeApiKey"];
-
-            builder.Services.AddSingleton(provider =>
-            {
-                return new YouTubeService(new BaseClientService.Initializer
-                {
-                    ApiKey = apiKey,
-                    ApplicationName = "KursAppen"
-                });
-            });
 
 
             var app = builder.Build();
