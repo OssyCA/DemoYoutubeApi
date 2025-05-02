@@ -17,6 +17,17 @@ namespace DemoYoutubeApi
             builder.Services.AddControllers();
             builder.Services.AddMemoryCache();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyMethod()
+                               .AllowAnyHeader();
+                    });
+            });
+
             builder.Services.AddDbContext<YoutubeDbContext>(option =>
             {
                 option.UseSqlServer(builder.Configuration.GetConnectionString("connectionString"));
@@ -52,7 +63,7 @@ namespace DemoYoutubeApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.UseCors("AllowAllOrigins");
 
             app.MapControllers();
 
